@@ -55,6 +55,8 @@ public class ThreeRows extends JPanel
                 try
                 {
                     stage = 1;
+                    if (nums.size() < 21)
+                        nums = getList(52);
                     init();
                 }
                 catch (IOException ex)
