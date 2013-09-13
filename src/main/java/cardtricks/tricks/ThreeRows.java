@@ -39,15 +39,32 @@ public class ThreeRows extends JPanel
     private final JRadioButton btn2;
     private final JRadioButton btn3;
     private final Component container;
+    private static final JButton reset = new JButton("Replay");
+    private static JPanel s = new JPanel();
     public ThreeRows(Component c) throws IOException
     {
         stage = 1;
         container = c;
+        
+        reset.addActionListener(new ActionListener()
+        {
 
-        // main
-        
-        this.setLayout(new GridLayout(3, 1));
-        
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                try
+                {
+                    stage = 1;
+                    init();
+                }
+                catch (IOException ex)
+                {
+                    Logger.getLogger(ThreeRows.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        });
+        s.add(reset);
         // set border
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         
@@ -67,11 +84,7 @@ public class ThreeRows extends JPanel
         group.add(btn3);
         
         // three rows
-        rows[0] = getRandom(nums);
-        rows[1] = getRandom(nums);
-        rows[2] = getRandom(nums);
-
-        repaintPanel();
+        init();
     }
 
     public int getStage()
@@ -79,6 +92,14 @@ public class ThreeRows extends JPanel
         return stage;
     }
 
+    private final void init() throws IOException
+    {
+        rows[0] = getRandom(nums);
+        rows[1] = getRandom(nums);
+        rows[2] = getRandom(nums);
+
+        repaintPanel();
+    }
     private static List<Byte> nums = getList(52);
     private static Random rand = new Random();
     private static List<Byte> getList(int count)
@@ -109,12 +130,50 @@ public class ThreeRows extends JPanel
     {
         return ThreeRows.class.getResourceAsStream("/deck/" + num + ".png");
     }
+    
+    final void paintResult(byte num) throws IOException
+    {
+        this.removeAll();
+        setLayout(new BorderLayout());
+        
+        // north
+        JPanel n = new JPanel();
+        n.add(new JLabel("Your card is:"));
+        add(n, BorderLayout.NORTH);
+        
+        // central pn
+        JPanel c = new JPanel();
+        BufferedImage cardPic = ImageIO.read(toStream(num));
+        JLabel cardLabel = new JLabel(new ImageIcon(cardPic.getScaledInstance(80, 116, Image.SCALE_SMOOTH)));
+        c.add(cardLabel);
+        add(c, BorderLayout.CENTER);
+        
+        // south
+        add(s, BorderLayout.SOUTH);
+        
+        this.repaint();
+        container.setSize(container.getWidth(), container.getHeight() + 1);
+        container.repaint();
+        
+    }
+
     final void repaintPanel() throws IOException
     {
         this.removeAll();
-        add(new CardColumn(rows[0], btn1));
-        add(new CardColumn(rows[1], btn2));
-        add(new CardColumn(rows[2], btn3));
+        setLayout(new BorderLayout());
+        
+        // cards
+        JPanel cards = new JPanel(new GridLayout(3, 1));
+        cards.add(new CardColumn(rows[0], btn1));
+        cards.add(new CardColumn(rows[1], btn2));
+        cards.add(new CardColumn(rows[2], btn3));
+        
+        // instruction
+        JPanel textPanel = new JPanel();
+        textPanel.add(new JLabel("Stage - " + stage + ": Select the row that has your card!"));
+        
+        add(cards, BorderLayout.CENTER);
+        add(textPanel, BorderLayout.NORTH);
         this.repaint();
         container.setSize(container.getWidth(), container.getHeight() + 1);
         container.repaint();
@@ -134,6 +193,18 @@ public class ThreeRows extends JPanel
         public void actionPerformed(ActionEvent e)
         {
             ++stage;
+            if (stage == 4)
+            {
+                try
+                {
+                    paintResult(rows[b].get(3));
+                }
+                catch (IOException ex)
+                {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+                return;
+            }
             mix(rows, a, b, c);
             try
             {
