@@ -1,5 +1,7 @@
 card-tricks
 ===========
+Well, it's Friday 13th, so it's only fitting that we are doing some card-tricks. ;) Good luck!
+
 
 Build as Desktop App
 ====================
