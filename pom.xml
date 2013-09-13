@@ -56,52 +56,51 @@
             <!-- build executable jar -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                 <version>2.2-beta-5</version>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>cardtricks.Main.MainJFrame</mainClass>
+                            <mainClass>cardtricks.Main.MainJApplet</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
                 <executions>
                     <execution>
+                        <id>make-my-applet-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                     </execution>
+<!--                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>-->
                 </executions>
             </plugin>
-            <!-- Unit tests -->
-<!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.11</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*IT.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
--->
-            <!-- Generate test-jar -->
-<!--            <plugin>
+            <!-- sign the applet-->
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <keystore>src/main/keystore/signing-jar.keystore</keystore>
+                    <alias>applet</alias>
+                    <storepass>applet</storepass>
+                    <verify>true</verify>
+                </configuration>
             </plugin>
--->
         </plugins>
     </build>
 </project>

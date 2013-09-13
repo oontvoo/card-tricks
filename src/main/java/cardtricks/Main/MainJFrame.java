@@ -18,14 +18,7 @@ public class MainJFrame extends JFrame
         this.setMinimumSize(new Dimension(600, 500));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setAlwaysOnTop(true);
         setVisible(true);
-    }
-    
-    public static void main(String args[]) throws IOException
-    {
-        // TODO  move main to another field and have a config
-        // file to control which class to call
-        
-        new MainJFrame();
     }
 }

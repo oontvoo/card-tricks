@@ -31,42 +31,49 @@ import javax.swing.border.EtchedBorder;
  */
 public class ThreeRows extends JPanel
 {
-    private static int stage = 1;
-    List<Byte>[] rows = new List[3];
-   // private final JTextField instruction;
+    private static final JLabel INS[] = new JLabel[]
+    {
+        new JLabel("Step 0 - Mentally pick a card, stare (hard) at it, and select the row that it belongs to!"),
+        new JLabel("Step 1 -  Select the row that has your card!"),
+        new JLabel("Step 2 -  Select the row that has your card again!"),
+        new JLabel("And ... the card you chose is: (Yeah, I know! ;) )")
+    };
+    private static int RESULT = 3;
+    private int step = 0;
+    List<String>[] rows = new List[3];
     private final ButtonGroup group;
     private final JRadioButton btn1;
     private final JRadioButton btn2;
     private final JRadioButton btn3;
     private final Component container;
-    private static final JButton reset = new JButton("Replay");
-    private static JPanel s = new JPanel();
+    private final JButton resetBtn = new JButton("Replay");
+    private final JPanel resetPanel = new JPanel();
     public ThreeRows(Component c) throws IOException
     {
-        stage = 1;
+        step = 0;
         container = c;
         
-        reset.addActionListener(new ActionListener()
+        resetBtn.addActionListener(new ActionListener()
         {
-
             @Override
             public void actionPerformed(ActionEvent e)
             {
                 try
                 {
-                    stage = 1;
-                    if (nums.size() < 21)
-                        nums = getList(52);
+                    step = 0;
                     init();
                 }
                 catch (IOException ex)
                 {
                     Logger.getLogger(ThreeRows.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
-            
+            }   
         });
-        s.add(reset);
+        resetPanel.add(resetBtn);
+        
+        // set layout
+        setLayout(new BorderLayout());
+        
         // set border
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         
@@ -84,24 +91,27 @@ public class ThreeRows extends JPanel
         group.add(btn1);
         group.add(btn2);
         group.add(btn3);
-        
+
         // three rows
         init();
     }
 
-    public int getStage()
+    public int getStep()
     {
-        return stage;
+        return step;
     }
 
     private final void init() throws IOException
     {
+        if (nums.size() < 21)
+            nums = getList(52);
         rows[0] = getRandom(nums);
         rows[1] = getRandom(nums);
         rows[2] = getRandom(nums);
 
         repaintPanel();
     }
+    
     private static List<Byte> nums = getList(52);
     private static Random rand = new Random();
     private static List<Byte> getList(int count)
@@ -114,44 +124,45 @@ public class ThreeRows extends JPanel
         return ret;
     }
     
-    private static List<Byte> getRandom(List<Byte> pool)
+    private static List<String> getRandom(List<Byte> pool)
     {
         if (pool.size()  < 7)
         {
             throw new IllegalArgumentException("Not enough items in pool! " + pool);
         }
-        List<Byte> ret = new ArrayList<Byte>(7);
+
+        List<String> ret = new ArrayList<String>(7);
         for (int n = 0; n < 7; ++n)
         {
-            ret.add(pool.remove(rand.nextInt(pool.size())));
+            ret.add("/deck/" + pool.remove(rand.nextInt(pool.size())) + ".png");
         }
         return ret;
     }
     
-    static InputStream toStream(byte num)
+    static InputStream toStream(String path)
     {
-        return ThreeRows.class.getResourceAsStream("/deck/" + num + ".png");
+        return ThreeRows.class.getResourceAsStream(path);
     }
     
-    final void paintResult(byte num) throws IOException
+    final void paintResult(String num) throws IOException
     {
         this.removeAll();
         setLayout(new BorderLayout());
         
         // north
         JPanel n = new JPanel();
-        n.add(new JLabel("Your card is:"));
+        n.add(INS[RESULT]);
         add(n, BorderLayout.NORTH);
         
         // central pn
         JPanel c = new JPanel();
-        BufferedImage cardPic = ImageIO.read(toStream(num));
+        BufferedImage cardPic = ImageIO.read(getClass().getResourceAsStream(num));
         JLabel cardLabel = new JLabel(new ImageIcon(cardPic.getScaledInstance(80, 116, Image.SCALE_SMOOTH)));
         c.add(cardLabel);
         add(c, BorderLayout.CENTER);
         
         // south
-        add(s, BorderLayout.SOUTH);
+        add(resetPanel, BorderLayout.SOUTH);
         
         this.repaint();
         container.setSize(container.getWidth(), container.getHeight() + 1);
@@ -162,8 +173,8 @@ public class ThreeRows extends JPanel
     final void repaintPanel() throws IOException
     {
         this.removeAll();
-        setLayout(new BorderLayout());
-        
+        group.clearSelection();
+
         // cards
         JPanel cards = new JPanel(new GridLayout(3, 1));
         cards.add(new CardColumn(rows[0], btn1));
@@ -172,12 +183,16 @@ public class ThreeRows extends JPanel
         
         // instruction
         JPanel textPanel = new JPanel();
-        textPanel.add(new JLabel("Stage - " + stage + ": Select the row that has your card!"));
+        textPanel.add(INS[step]);
         
         add(cards, BorderLayout.CENTER);
         add(textPanel, BorderLayout.NORTH);
-        this.repaint();
-        container.setSize(container.getWidth(), container.getHeight() + 1);
+        
+        // repaint
+        int w = container.getWidth();
+        int h = container.getHeight();
+        container.setSize(w, h + 1); // TODO: hacky way to force the frame to repaint! Fix it!
+        container.setSize(w, h);
         container.repaint();
     }
 
@@ -194,8 +209,8 @@ public class ThreeRows extends JPanel
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ++stage;
-            if (stage == 4)
+            ++step;
+            if (step == 3)
             {
                 try
                 {
@@ -218,11 +233,11 @@ public class ThreeRows extends JPanel
             }
         }
         
-        private void mix(List<Byte>[] rows, int a, int b, int c)
+        private void mix(List<String>[] rows, int a, int b, int c)
         {
-            List<Byte> first = new ArrayList<Byte>(7);
-            List<Byte> second = new ArrayList<Byte>(7);
-            List<Byte> third = new ArrayList<Byte>(7);
+            List<String> first = new ArrayList<String>(7);
+            List<String> second = new ArrayList<String>(7);
+            List<String> third = new ArrayList<String>(7);
             
             first.add(rows[a].get(0));
             first.add(rows[a].get(1));
@@ -258,7 +273,7 @@ public class ThreeRows extends JPanel
     {
         private static final int W = 60;
         private static final int H = 87;
-        public CardColumn (final List<Byte> cards, JRadioButton btn) throws IOException
+        public CardColumn (final List<String> cards, JRadioButton btn) throws IOException
         {
             super(new GridLayout(1, 8));
             if (cards.size() != 7)
@@ -269,9 +284,9 @@ public class ThreeRows extends JPanel
             setBorder(BorderFactory.createEtchedBorder());
             
             // cards
-            for (Byte card : cards)
+            for (String card : cards)
             {
-                BufferedImage cardPic = ImageIO.read(toStream(card));
+                BufferedImage cardPic = ImageIO.read(ThreeRows.class.getResourceAsStream(card));
                 JLabel cardLabel = new JLabel(new ImageIcon(cardPic.getScaledInstance(W, H, Image.SCALE_SMOOTH)));
                 add(cardLabel);
             }
@@ -279,7 +294,6 @@ public class ThreeRows extends JPanel
             //  button
             JPanel btnPanel = new JPanel(new BorderLayout());
             btnPanel.add(btn, BorderLayout.CENTER);
-            
             add(btnPanel);
         }
     }
