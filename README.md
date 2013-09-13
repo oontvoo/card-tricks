@@ -23,3 +23,9 @@ To build an applet `jar` to run in a browser
 	
 This will build the `jar` and also sign it. (The certificate is only valid for six months!)
 See the simple <a href="https://github.com/oontvoo/card-tricks/blob/master/index.html">`index.html`</a> for example of how to use the applet jar.
+
+
+
+Note: If you want, you can also create your own keystore by running something like this:
+
+    keytool -genkey -alias applet -keyalg RSA -keystore src/main/keystore/signing-jar.keystore -storepass applet -keypass applet -dname "CN=domain"
