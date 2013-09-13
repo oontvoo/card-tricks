@@ -22,4 +22,4 @@ To build an applet `jar` to run in a browser
     mvn clean package
 	
 This will build the `jar` and also sign it. (The certificate is only valid for six months!)
-See the simple `index.html` for example of how to use the applet jar.
+See the simple <a href="https://github.com/oontvoo/card-tricks/blob/master/index.html">`index.html`</a> for example of how to use the applet jar.
