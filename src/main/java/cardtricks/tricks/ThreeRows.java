@@ -254,7 +254,7 @@ public class ThreeRows extends JPanel
         
         // repaint
         // TODO: hacky way to force the frame to repaint! Fix it!
-        if (container instanceof JFrame)
+       // if (container instanceof JFrame)
         {
             int w = container.getWidth();
             int h = container.getHeight();
