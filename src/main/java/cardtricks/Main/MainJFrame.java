@@ -18,9 +18,6 @@ package cardtricks.Main;
 
 import cardtricks.tricks.ThreeRows;
 import java.awt.Dimension;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsDevice.WindowTranslucency;
-import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import javax.swing.JFrame;
 

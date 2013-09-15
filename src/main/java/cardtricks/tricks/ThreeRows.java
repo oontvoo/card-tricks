@@ -243,11 +243,9 @@ public class ThreeRows extends JPanel
         
         // south
         add(resetPanel, BorderLayout.SOUTH);
-        
-        this.repaint();
-        container.setSize(container.getWidth(), container.getHeight() + 1);
+
         container.repaint();
-        
+        container.revalidate();        
     }
 
     private final void repaintPanel() throws IOException
@@ -267,17 +265,9 @@ public class ThreeRows extends JPanel
         
         add(cards, BorderLayout.CENTER);
         add(textPanel, BorderLayout.NORTH);
-        
-        // repaint
-        // TODO: hacky way to force the frame to repaint! Fix it!
-       // if (container instanceof JFrame)
-        {
-            int w = container.getWidth();
-            int h = container.getHeight();
-            container.setSize(w, h + 1);
-            container.setSize(w, h);
-        }
+
         container.repaint();
+        container.revalidate();
     }
 
     private class JBtnListener implements ActionListener
