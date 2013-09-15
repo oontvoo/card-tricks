@@ -11,7 +11,7 @@ To build an executable jar (for running locally as a Desktop application):
 
 This will produce a jar called `*-jar-with-dependencies.jar` under `target`.
 You can either click on the jar to run it or, from the command line, run
-    `java -jar target/*-jar-with-dependencies.jar`
+    `java -jar target/*-jar-with-dependencies.jar [<OPACITY>]`
 
 
 Applet
