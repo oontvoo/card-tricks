@@ -59,9 +59,7 @@ public class ThreeRows extends JPanel
     
     // wait time (while the cards are being drawn)
     private static final long TIMED_OUT = 10000L;
-    
-    // splash screen shown while the cards are being drawn
-    private final JWindow waitPopup = new WaitWindow();
+
     private final Object PAINT_LOCK = 0;
     
     private final InitBoardTask initBoardTask = new InitBoardTask();
@@ -208,6 +206,7 @@ public class ThreeRows extends JPanel
 
     private final void init() throws IOException
     {
+        JWindow waitPopup = new WaitWindow();
         waitPopup.setVisible(true);
         new Thread(initBoardTask).start();
         try
@@ -216,8 +215,7 @@ public class ThreeRows extends JPanel
             {
                 PAINT_LOCK.wait(TIMED_OUT);
             }
-            //waitPopup.dispose();
-            waitPopup.setVisible(false);
+            waitPopup.dispose();
         }
         catch (InterruptedException ex)
         {
