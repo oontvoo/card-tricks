@@ -1,4 +1,18 @@
-
+/**
+ * Copyright (C) 2013 Vy Thao Nguyen
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package cardtricks.tricks;
 
@@ -9,10 +23,12 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -22,10 +38,10 @@ import javax.swing.border.EtchedBorder;
 /**
  * The trick: 
  * - pick a random 21 cards out of a 52-card deck.
- * - deal them into 3 columns
+ * - deal them into 3 rows/columns 
  * - ask the user to *stare* silently at one card
- * - ask them to point to the column that has the card
- * -
+ * - ask them to point to the column that has the card 3 times
+ * - correctly point out which card the user has chosen
  * 
  * @author Vy Thao Nguyen
  */
@@ -173,7 +189,7 @@ public class ThreeRows extends JPanel
     final void repaintPanel() throws IOException
     {
         this.removeAll();
-        group.clearSelection();
+       // group.clearSelection();
 
         // cards
         JPanel cards = new JPanel(new GridLayout(3, 1));

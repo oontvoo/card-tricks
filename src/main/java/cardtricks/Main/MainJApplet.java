@@ -16,35 +16,44 @@
 package cardtricks.Main;
 
 import cardtricks.tricks.ThreeRows;
-import java.applet.Applet;
-import java.awt.Color;
-import java.awt.Graphics;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFrame;
+import javax.swing.JApplet;
 
 /**
  *
  * @author Vy Thao Nguyen
  */
-public class MainJApplet extends Applet
+public class MainJApplet extends JApplet
 {
+    /**
+     * Entry point for the applet-version
+     */
     @Override
     public void init()
     {
-        main(null);
-    }
-    
-    public static void main(String[] args)
-    {
         try
         {
-            JFrame fr = new MainJFrame();
+            add(new ThreeRows(this));
         }
         catch (IOException ex)
         {
             javax.swing.JOptionPane.showMessageDialog(null, "Opps, something went wrong! Try reloading the page!");
+        }
+    }
+    
+    /**
+     * Entry point for the desktop-app version
+     * @param args 
+     */
+    public static void main(String args[])
+    {
+        try
+        {
+            new MainJFrame();
+        }
+        catch(IOException ex)
+        {
+            javax.swing.JOptionPane.showMessageDialog(null, "Opps, something went wrong! Try restarting the app!");
         }
     }
 }
