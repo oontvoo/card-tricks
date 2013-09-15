@@ -80,11 +80,10 @@ public class ThreeRows extends JPanel
     private final JRadioButton btn2;
     private final JRadioButton btn3;
     
-    // parent frame (some tricks need to be done with the JFRame to get it 
-    // to repain properly!!!)
+    // parent frame (the parent needs to be `re-validated` upon repainting cards)
     private final Component container;
     
-    // reset (ie., go back to the stage as though the app has just started)
+    // reset (ie., go back to the initial stage of the game, as though the app had just started)
     private final JButton resetBtn = new JButton("Replay");
     private final JPanel resetPanel = new JPanel();
 
@@ -98,7 +97,7 @@ public class ThreeRows extends JPanel
             {
                 try
                 {
-                    //TODO: Why does the splash stil NOT show up on reset???????
+                    //TODO: Why does the splash stil NOT show up upon reset???????
                     init();
                 }
                 catch (IOException ex)
@@ -255,9 +254,9 @@ public class ThreeRows extends JPanel
 
         // cards
         JPanel cards = new JPanel(new GridLayout(3, 1));
-        cards.add(new CardColumn(rows[0], btn1));
-        cards.add(new CardColumn(rows[1], btn2));
-        cards.add(new CardColumn(rows[2], btn3));
+        cards.add(new CardRow(rows[0], btn1));
+        cards.add(new CardRow(rows[1], btn2));
+        cards.add(new CardRow(rows[2], btn3));
         
         // instruction
         JPanel textPanel = new JPanel();
@@ -308,9 +307,9 @@ public class ThreeRows extends JPanel
         }
     }
 
-    private static class CardColumn extends JPanel
+    private static class CardRow extends JPanel
     {
-        public CardColumn (final List<JLabel> cards, JRadioButton btn) throws IOException
+        public CardRow (final List<JLabel> cards, JRadioButton btn) throws IOException
         {
             super(new GridLayout(1, 8));
             if (cards.size() != 7)
