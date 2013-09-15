@@ -72,7 +72,7 @@ public class ThreeRows extends JPanel
     private final JRadioButton btn2;
     private final JRadioButton btn3;
     
-    // parent frame (some tricks needs to be done with the JFRame to get it 
+    // parent frame (some tricks need to be done with the JFRame to get it 
     // to repain properly!!!)
     private final Component container;
     
@@ -253,10 +253,14 @@ public class ThreeRows extends JPanel
         add(textPanel, BorderLayout.NORTH);
         
         // repaint
-        int w = container.getWidth();
-        int h = container.getHeight();
-        container.setSize(w, h + 1); // TODO: hacky way to force the frame to repaint! Fix it!
-        container.setSize(w, h);
+        // TODO: hacky way to force the frame to repaint! Fix it!
+        if (container instanceof JFrame)
+        {
+            int w = container.getWidth();
+            int h = container.getHeight();
+            container.setSize(w, h + 1);
+            container.setSize(w, h);
+        }
         container.repaint();
     }
 
@@ -300,7 +304,6 @@ public class ThreeRows extends JPanel
 
     private static class CardColumn extends JPanel
     {
-        
         public CardColumn (final List<JLabel> cards, JRadioButton btn) throws IOException
         {
             super(new GridLayout(1, 8));
