@@ -34,7 +34,7 @@ public class MainJFrame extends JFrame
         this.setMinimumSize(new Dimension(600, 500));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setAlwaysOnTop(true);
+        //this.setAlwaysOnTop(true);
         setVisible(true);
     }
 }

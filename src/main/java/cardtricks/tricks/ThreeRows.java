@@ -16,10 +16,7 @@
 
 package cardtricks.tricks;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -58,6 +55,17 @@ public class ThreeRows extends JPanel
     private static final int H = 87; // width of the card
     private static Random rand = new Random();
     
+    private static final String WAIT_ICON_PATH = "/misc/hourglass.gif";
+    
+    // wait time (while the cards are being drawn)
+    private static final long TIMED_OUT = 10000L;
+    
+    // splash screen shown while the cards are being drawn
+    private final JWindow waitPopup = new WaitWindow();
+    private final Object PAINT_LOCK = 0;
+    
+    private final InitBoardTask initBoardTask = new InitBoardTask();
+    
     // pools of cards to choose from
     private List<Byte> nums = getList(52);
     
@@ -79,6 +87,7 @@ public class ThreeRows extends JPanel
     // reset (ie., go back to the stage as though the app has just started)
     private final JButton resetBtn = new JButton("Replay");
     private final JPanel resetPanel = new JPanel();
+
     public ThreeRows(Component c) throws IOException
     {
         container = c;   
@@ -89,6 +98,7 @@ public class ThreeRows extends JPanel
             {
                 try
                 {
+                    //TODO: Why does the splash stil NOT show up on reset???????
                     init();
                 }
                 catch (IOException ex)
@@ -199,15 +209,21 @@ public class ThreeRows extends JPanel
 
     private final void init() throws IOException
     {
-        step = 0;
-        if (nums.size() < 21)
-            nums = getList(52);
-        group.clearSelection();
-        rows[0] = getRandom(nums);
-        rows[1] = getRandom(nums);
-        rows[2] = getRandom(nums);
-
-        repaintPanel();
+        waitPopup.setVisible(true);
+        new Thread(initBoardTask).start();
+        try
+        {
+            synchronized(PAINT_LOCK)
+            {
+                PAINT_LOCK.wait(TIMED_OUT);
+            }
+            //waitPopup.dispose();
+            waitPopup.setVisible(false);
+        }
+        catch (InterruptedException ex)
+        {
+            JOptionPane.showMessageDialog(null, "Something went wrong! Please try restart the app");
+        }
     }
 
     private final void paintResult(JLabel card) throws IOException
@@ -324,6 +340,59 @@ public class ThreeRows extends JPanel
             JPanel btnPanel = new JPanel(new BorderLayout());
             btnPanel.add(btn, BorderLayout.CENTER);
             add(btnPanel);
+        }
+    }
+    
+    private static class WaitWindow extends JWindow
+    {
+        WaitWindow()
+        {
+            setSize(200, 100);
+            this.add(getHourGlass());
+            this.setLocationRelativeTo(null);
+            this.setAlwaysOnTop(true);
+        }
+    }
+
+    private class InitBoardTask implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            step = 0;
+            if (nums.size() < 21)
+                nums = getList(52);
+            group.clearSelection();
+            try
+            {
+                rows[0] = getRandom(nums);
+                rows[1] = getRandom(nums);
+                rows[2] = getRandom(nums);
+                repaintPanel();
+            }
+            catch(IOException ex)
+            {
+                JOptionPane.showMessageDialog(null, "Error reading image-files");
+            }
+            
+            synchronized(PAINT_LOCK)
+            {
+                PAINT_LOCK.notifyAll();
+            }
+        }   
+    }
+
+    private static JLabel getHourGlass()
+    {
+        try
+        {
+            return new JLabel(new ImageIcon(ThreeRows.class.getResource(WAIT_ICON_PATH)));
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Image not found!");
+            ex.printStackTrace();
+            return new JLabel("PLEASE WAIT"); // use text instead
         }
     }
 }
