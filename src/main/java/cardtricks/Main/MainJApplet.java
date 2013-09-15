@@ -16,8 +16,11 @@
 package cardtricks.Main;
 
 import cardtricks.tricks.ThreeRows;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import javax.swing.JApplet;
+import javax.swing.JFrame;
 
 /**
  *
@@ -49,7 +52,38 @@ public class MainJApplet extends JApplet
     {
         try
         {
-            new MainJFrame();
+            float opac = 1;
+            CheckOpacity:
+            if (args != null && args.length == 1)
+            {
+                try
+                {
+                    opac = Float.parseFloat(args[0]);
+                    if (opac < 0 || opac > 1)
+                    {
+                        System.err.println("Please supply value within [0.0, 1.0]");
+                        opac = 1;
+                        break CheckOpacity;
+                    }
+                    // Determine if the GraphicsDevice supports translucency.
+                    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                    GraphicsDevice gd = ge.getDefaultScreenDevice();
+
+                    if (gd.isWindowTranslucencySupported(GraphicsDevice.WindowTranslucency.TRANSLUCENT))
+                    {
+                        JFrame.setDefaultLookAndFeelDecorated(true);
+                    }
+                }
+                catch(NumberFormatException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            JFrame frame = new MainJFrame();
+            if (opac != 1.0f)
+            {
+                frame.setOpacity(opac);
+            }
         }
         catch(IOException ex)
         {

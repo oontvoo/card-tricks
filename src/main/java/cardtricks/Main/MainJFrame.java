@@ -18,6 +18,9 @@ package cardtricks.Main;
 
 import cardtricks.tricks.ThreeRows;
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsDevice.WindowTranslucency;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import javax.swing.JFrame;
 
@@ -34,7 +37,6 @@ public class MainJFrame extends JFrame
         this.setMinimumSize(new Dimension(600, 500));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //this.setAlwaysOnTop(true);
         setVisible(true);
     }
 }
