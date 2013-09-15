@@ -24,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,21 +53,35 @@ public class ThreeRows extends JPanel
         new JLabel("Step 2 -  Select the row that has your card again!"),
         new JLabel("And ... the card you chose is: (Yeah, I know! ;) )")
     };
-    private static int RESULT = 3;
-    private int step = 0;
-    List<JLabel>[] rows = new List[3];
+    private static int RESULT = 3;  // index of the result text in INS
+    private static final int W = 60; // height of the card
+    private static final int H = 87; // width of the card
+    private static Random rand = new Random();
+    
+    // pools of cards to choose from
+    private List<Byte> nums = getList(52);
+    
+    // current stage in the game
+    private int step;
+    
+    // the groups of cards
+    private List<JLabel>[] rows = new List[3];
+    
     private final ButtonGroup group;
     private final JRadioButton btn1;
     private final JRadioButton btn2;
     private final JRadioButton btn3;
+    
+    // parent frame (some tricks needs to be done with the JFRame to get it 
+    // to repain properly!!!)
     private final Component container;
+    
+    // reset (ie., go back to the stage as though the app has just started)
     private final JButton resetBtn = new JButton("Replay");
     private final JPanel resetPanel = new JPanel();
     public ThreeRows(Component c) throws IOException
     {
-        step = 0;
-        container = c;
-        
+        container = c;   
         resetBtn.addActionListener(new ActionListener()
         {
             @Override
@@ -76,7 +89,6 @@ public class ThreeRows extends JPanel
             {
                 try
                 {
-                    step = 0;
                     init();
                 }
                 catch (IOException ex)
@@ -108,29 +120,10 @@ public class ThreeRows extends JPanel
         group.add(btn2);
         group.add(btn3);
 
-        // three rows
+        // init the panel with random cards
         init();
     }
 
-    public int getStep()
-    {
-        return step;
-    }
-
-    private final void init() throws IOException
-    {
-        if (nums.size() < 21)
-            nums = getList(52);
-        group.clearSelection();
-        rows[0] = getRandom(nums);
-        rows[1] = getRandom(nums);
-        rows[2] = getRandom(nums);
-
-        repaintPanel();
-    }
-    
-    private static List<Byte> nums = getList(52);
-    private static Random rand = new Random();
     private static List<Byte> getList(int count)
     {
         List<Byte> ret = new LinkedList<Byte>();
@@ -141,6 +134,12 @@ public class ThreeRows extends JPanel
         return ret;
     }
     
+    /**
+     * 
+     * @param pool
+     * @return a list of 7 randomly selected cards from the given pool
+     * @throws IOException 
+     */
     private static List<JLabel> getRandom(List<Byte> pool) throws IOException
     {
         if (pool.size()  < 7)
@@ -157,12 +156,61 @@ public class ThreeRows extends JPanel
         return ret;
     }
     
-    static InputStream toStream(String path)
+    private static void mix(List<JLabel>[] rows, int a, int b, int c)
     {
-        return ThreeRows.class.getResourceAsStream(path);
+        List<JLabel> first = new ArrayList<JLabel>(7);
+        List<JLabel> second = new ArrayList<JLabel>(7);
+        List<JLabel> third = new ArrayList<JLabel>(7);
+
+        first.add(rows[a].get(0));
+        first.add(rows[a].get(1));
+        first.add(rows[a].get(2));
+        first.add(rows[b].get(2));
+        first.add(rows[b].get(5));
+        first.add(rows[c].get(0));
+        first.add(rows[c].get(1));
+
+        second.add(rows[a].get(3));
+        second.add(rows[a].get(4));
+        second.add(rows[b].get(0));
+        second.add(rows[b].get(3));
+        second.add(rows[b].get(6));
+        second.add(rows[c].get(2));
+        second.add(rows[c].get(3));
+
+        third.add(rows[a].get(5));
+        third.add(rows[a].get(6));
+        third.add(rows[b].get(1));
+        third.add(rows[b].get(4));
+        third.add(rows[c].get(4));
+        third.add(rows[c].get(5));
+        third.add(rows[c].get(6));
+
+        rows[0] = first;
+        rows[1]= second;
+        rows[2] = third;
+
     }
     
-    final void paintResult(JLabel card) throws IOException
+    public int getStep()
+    {
+        return step;
+    }
+
+    private final void init() throws IOException
+    {
+        step = 0;
+        if (nums.size() < 21)
+            nums = getList(52);
+        group.clearSelection();
+        rows[0] = getRandom(nums);
+        rows[1] = getRandom(nums);
+        rows[2] = getRandom(nums);
+
+        repaintPanel();
+    }
+
+    private final void paintResult(JLabel card) throws IOException
     {
         this.removeAll();
         setLayout(new BorderLayout());
@@ -186,10 +234,10 @@ public class ThreeRows extends JPanel
         
     }
 
-    final void repaintPanel() throws IOException
+    private final void repaintPanel() throws IOException
     {
         this.removeAll();
-       // group.clearSelection();
+       // group.clearSelection(); probably leave the selected button as is?
 
         // cards
         JPanel cards = new JPanel(new GridLayout(3, 1));
@@ -225,8 +273,7 @@ public class ThreeRows extends JPanel
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ++step;
-            if (step == 3)
+            if (step == 2) // last step
             {
                 try
                 {
@@ -238,6 +285,7 @@ public class ThreeRows extends JPanel
                 }
                 return;
             }
+            ++step;
             mix(rows, a, b, c);
             try
             {
@@ -248,45 +296,8 @@ public class ThreeRows extends JPanel
                 JOptionPane.showMessageDialog(null, ex.getMessage());
             }
         }
-        
-        private void mix(List<JLabel>[] rows, int a, int b, int c)
-        {
-            List<JLabel> first = new ArrayList<JLabel>(7);
-            List<JLabel> second = new ArrayList<JLabel>(7);
-            List<JLabel> third = new ArrayList<JLabel>(7);
-            
-            first.add(rows[a].get(0));
-            first.add(rows[a].get(1));
-            first.add(rows[a].get(2));
-            first.add(rows[b].get(2));
-            first.add(rows[b].get(5));
-            first.add(rows[c].get(0));
-            first.add(rows[c].get(1));
-            
-            second.add(rows[a].get(3));
-            second.add(rows[a].get(4));
-            second.add(rows[b].get(0));
-            second.add(rows[b].get(3));
-            second.add(rows[b].get(6));
-            second.add(rows[c].get(2));
-            second.add(rows[c].get(3));
-            
-            third.add(rows[a].get(5));
-            third.add(rows[a].get(6));
-            third.add(rows[b].get(1));
-            third.add(rows[b].get(4));
-            third.add(rows[c].get(4));
-            third.add(rows[c].get(5));
-            third.add(rows[c].get(6));
-            
-            rows[0] = first;
-            rows[1]= second;
-            rows[2] = third;
-            
-        }
     }
-    private static final int W = 60;
-    private static final int H = 87;
+
     private static class CardColumn extends JPanel
     {
         
