@@ -56,7 +56,7 @@ public class ThreeRows extends JPanel
     };
     private static int RESULT = 3;
     private int step = 0;
-    List<String>[] rows = new List[3];
+    List<JLabel>[] rows = new List[3];
     private final ButtonGroup group;
     private final JRadioButton btn1;
     private final JRadioButton btn2;
@@ -121,6 +121,7 @@ public class ThreeRows extends JPanel
     {
         if (nums.size() < 21)
             nums = getList(52);
+        group.clearSelection();
         rows[0] = getRandom(nums);
         rows[1] = getRandom(nums);
         rows[2] = getRandom(nums);
@@ -140,17 +141,18 @@ public class ThreeRows extends JPanel
         return ret;
     }
     
-    private static List<String> getRandom(List<Byte> pool)
+    private static List<JLabel> getRandom(List<Byte> pool) throws IOException
     {
         if (pool.size()  < 7)
         {
             throw new IllegalArgumentException("Not enough items in pool! " + pool);
         }
 
-        List<String> ret = new ArrayList<String>(7);
+        List<JLabel> ret = new ArrayList<JLabel>(7);
         for (int n = 0; n < 7; ++n)
         {
-            ret.add("/deck/" + pool.remove(rand.nextInt(pool.size())) + ".png");
+            BufferedImage cardPic = ImageIO.read(ThreeRows.class.getResourceAsStream("/deck/" + pool.remove(rand.nextInt(pool.size())) + ".png"));
+            ret.add(new JLabel(new ImageIcon(cardPic.getScaledInstance(W, H, Image.SCALE_SMOOTH))));
         }
         return ret;
     }
@@ -160,7 +162,7 @@ public class ThreeRows extends JPanel
         return ThreeRows.class.getResourceAsStream(path);
     }
     
-    final void paintResult(String num) throws IOException
+    final void paintResult(JLabel card) throws IOException
     {
         this.removeAll();
         setLayout(new BorderLayout());
@@ -172,9 +174,7 @@ public class ThreeRows extends JPanel
         
         // central pn
         JPanel c = new JPanel();
-        BufferedImage cardPic = ImageIO.read(getClass().getResourceAsStream(num));
-        JLabel cardLabel = new JLabel(new ImageIcon(cardPic.getScaledInstance(80, 116, Image.SCALE_SMOOTH)));
-        c.add(cardLabel);
+        c.add(card);
         add(c, BorderLayout.CENTER);
         
         // south
@@ -249,11 +249,11 @@ public class ThreeRows extends JPanel
             }
         }
         
-        private void mix(List<String>[] rows, int a, int b, int c)
+        private void mix(List<JLabel>[] rows, int a, int b, int c)
         {
-            List<String> first = new ArrayList<String>(7);
-            List<String> second = new ArrayList<String>(7);
-            List<String> third = new ArrayList<String>(7);
+            List<JLabel> first = new ArrayList<JLabel>(7);
+            List<JLabel> second = new ArrayList<JLabel>(7);
+            List<JLabel> third = new ArrayList<JLabel>(7);
             
             first.add(rows[a].get(0));
             first.add(rows[a].get(1));
@@ -285,11 +285,12 @@ public class ThreeRows extends JPanel
             
         }
     }
+    private static final int W = 60;
+    private static final int H = 87;
     private static class CardColumn extends JPanel
     {
-        private static final int W = 60;
-        private static final int H = 87;
-        public CardColumn (final List<String> cards, JRadioButton btn) throws IOException
+        
+        public CardColumn (final List<JLabel> cards, JRadioButton btn) throws IOException
         {
             super(new GridLayout(1, 8));
             if (cards.size() != 7)
@@ -299,12 +300,10 @@ public class ThreeRows extends JPanel
             
             setBorder(BorderFactory.createEtchedBorder());
             
-            // cards
-            for (String card : cards)
+            // pain the cards onto the panel
+            for (JLabel card : cards)
             {
-                BufferedImage cardPic = ImageIO.read(ThreeRows.class.getResourceAsStream(card));
-                JLabel cardLabel = new JLabel(new ImageIcon(cardPic.getScaledInstance(W, H, Image.SCALE_SMOOTH)));
-                add(cardLabel);
+                add(card);
             }
 
             //  button
